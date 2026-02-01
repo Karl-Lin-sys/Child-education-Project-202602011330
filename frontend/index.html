@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VRコミュニケーション - 幼児・小学生向け</title>
+    <meta name="description" content="VRとAIで子どものコミュニケーション能力を育成">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">🎮</div>
+                <h1>VR Talk</h1>
+                <span class="subtitle">コミュニケーション練習</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-section="home">
+                    <span class="nav-icon">🏠</span>ホーム
+                </a>
+                <a href="#" class="nav-item" data-section="scenarios">
+                    <span class="nav-icon">🎬</span>シナリオ
+                </a>
+                <a href="#" class="nav-item" data-section="vr-room">
+                    <span class="nav-icon">🥽</span>VRルーム
+                </a>
+                <a href="#" class="nav-item" data-section="chat">
+                    <span class="nav-icon">💬</span>AIチャット
+                </a>
+                <a href="#" class="nav-item" data-section="progress">
+                    <span class="nav-icon">📊</span>進捗
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="api-status" id="apiStatus">
+                    <span class="status-dot"></span>
+                    <span>接続確認中...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">
+                    <h2 id="pageTitle">ホーム</h2>
+                    <p id="pageDescription">VRでコミュニケーションを楽しく学ぼう！</p>
+                </div>
+                <div class="header-actions">
+                    <select id="ageGroupSelect" class="age-select">
+                        <option value="幼児">幼児（3-5歳）</option>
+                        <option value="低学年" selected>低学年（6-8歳）</option>
+                        <option value="高学年">高学年（9-12歳）</option>
+                    </select>
+                </div>
+            </header>
+
+            <!-- ホームセクション -->
+            <section id="home" class="section active">
+                <div class="welcome-card">
+                    <div class="welcome-content">
+                        <h3>🌟 ようこそ！</h3>
+                        <p>VRとAIを使って、お友達との話し方を練習しよう！</p>
+                        <div class="quick-actions">
+                            <button class="action-btn primary" onclick="switchSection('scenarios')">
+                                🎬 シナリオを選ぶ
+                            </button>
+                            <button class="action-btn secondary" onclick="switchSection('chat')">
+                                💬 AIと話す
+                            </button>
+                        </div>
+                    </div>
+                    <div class="welcome-illustration">🧒👧🤖</div>
+                </div>
+
+                <div class="skills-overview">
+                    <h3>💪 練習できるスキル</h3>
+                    <div class="skills-grid" id="skillsGrid"></div>
+                </div>
+
+                <div class="emotions-overview">
+                    <h3>😊 感情を理解しよう</h3>
+                    <div class="emotions-grid" id="emotionsGrid"></div>
+                </div>
+            </section>
+
+            <!-- シナリオセクション -->
+            <section id="scenarios" class="section">
+                <div class="filter-bar">
+                    <label>カテゴリ：</label>
+                    <select id="categoryFilter">
+                        <option value="">すべて</option>
+                    </select>
+                </div>
+                <div class="scenarios-grid" id="scenariosGrid"></div>
+            </section>
+
+            <!-- VRルーム -->
+            <section id="vr-room" class="section">
+                <div class="vr-container">
+                    <div class="vr-viewport" id="vrViewport">
+                        <div class="vr-placeholder">
+                            <span class="vr-icon">🥽</span>
+                            <p>シナリオを選択してVR体験を始めよう！</p>
+                            <button class="action-btn primary" onclick="switchSection('scenarios')">
+                                シナリオを選ぶ
+                            </button>
+                        </div>
+                    </div>
+                    <div class="vr-controls" id="vrControls" style="display:none;">
+                        <div class="scene-info" id="sceneInfo"></div>
+                        <div class="dialogue-box" id="dialogueBox"></div>
+                        <div class="input-area">
+                            <input type="text" id="vrInput" placeholder="話しかけてみよう...">
+                            <button class="send-btn" onclick="sendVRMessage()">送信</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AIチャット -->
+            <section id="chat" class="section">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-welcome">
+                            <div class="ai-avatar">🤖</div>
+                            <p>こんにちは！私はAIパートナーだよ。<br>なんでも話してね！</p>
+                        </div>
+                    </div>
+                    <div class="emotion-display" id="emotionDisplay">
+                        <span class="emotion-label">あなたの気持ち：</span>
+                        <span class="emotion-value" id="currentEmotion">😊</span>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="メッセージを入力...">
+                        <button class="send-btn" onclick="sendChatMessage()">送信</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 進捗 -->
+            <section id="progress" class="section">
+                <div class="progress-overview">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="sessionsCount">0</span>
+                            <span class="stat-label">練習回数</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalMinutes">0</span>
+                            <span class="stat-label">練習時間（分）</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">😊</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="emotionStability">-</span>
+                            <span class="stat-label">感情安定度</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>スキル成長</h3>
+                    <canvas id="skillChart"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="vr-scene.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
